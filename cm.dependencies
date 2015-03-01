@@ -1,0 +1,6 @@
+[
+ {
+   "repository": "android_kernel_raspberryPi_rpiv2",
+   "target_path": "kernel/raspberryPi/rpiv2"
+ }
+]
