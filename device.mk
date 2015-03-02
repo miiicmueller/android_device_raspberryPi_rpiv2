@@ -1,3 +1,12 @@
+ifeq ($(TARGET_PREBUILT_KERNEL),)
+	LOCAL_KERNEL := device/raspberryPi/rpiv2/kernel
+else
+	LOCAL_KERNEL := $(TARGET_PREBUILT_KERNEL)
+endif
+
+PRODUCT_COPY_FILES += \
+    $(LOCAL_KERNEL):kernel
+
 PRODUCT_COPY_FILES += \
     device/raspberryPi/rpiv2/recovery.fstab:root/recovery.fstab
 
@@ -83,8 +92,8 @@ PRODUCT_PROPERTY_OVERRIDES += \
 
 PRODUCT_CHARACTERISTICS := nosdcard
 
-DEVICE_PACKAGE_OVERLAYS := \
-    device/raspberryPi/rpiv2/overlay
+#DEVICE_PACKAGE_OVERLAYS := \
+#    device/raspberryPi/rpiv2/overlay
 
 
 # setup dalvik vm configs.

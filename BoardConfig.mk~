@@ -17,10 +17,8 @@
 # These two variables are set first, so they can be overridden
 # by BoardConfigVendor.mk
 
-include build/target/board/generic/BoardConfig.mk
-
 TARGET_ARCH := arm
-TARGET_BOARD_PLATFORM := BCM2836
+TARGET_BOARD_PLATFORM := bcm2836
 TARGET_CPU_SMP := true
 TARGET_CPU_ABI := armeabi-v7a
 TARGET_CPU_ABI2 := armeabi
@@ -44,13 +42,15 @@ DONT_DEXPREOPT_PREBUILTS := true
 
 
 # bootloader
+TARGET_NO_RADIOIMAGE := true
 TARGET_NO_BOOTLOADER := true
 TARGET_BOOTLOADER_BOARD_NAME := rpiv2
 
 # kernel
+KERNEL_TOOLCHAIN_PREFIX := /home/DarkOne/Rpi/tools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian-x64/bin/arm-linux-gnueabihf-
 TARGET_KERNEL_SOURCE := kernel/raspberryPi/rpiv2
 TARGET_KERNEL_CONFIG := cyanogenmod_rpiv2_defconfig
-BOARD_KERNEL_IMAGE_NAME := zImage-dtb
+BOARD_KERNEL_IMAGE_NAME := zImage
 BOARD_MKBOOTIMG_ARGS := --ramdisk_offset 0x02900000 --tags_offset 0x02700000
 BOARD_KERNEL_CMDLINE := console=ttyAMA0,115200 kgdboc=ttyAMA0,115200 root=/dev/mmcblk0p2 rootfstype=ext4 rootwait
 BOARD_KERNEL_BASE := 0x00000000
@@ -75,8 +75,8 @@ TARGET_SCREEN_WIDTH := 1080
 
 # partition sizes
 TARGET_USERIMAGES_USE_EXT4 := true
-BOARD_BOOTIMAGE_PARTITION_SIZE := 16777216 # 16M
-BOARD_RECOVERYIMAGE_PARTITION_SIZE := 671088640 #640M
+BOARD_BOOTIMAGE_PARTITION_SIZE := 58720256 # 56M
+BOARD_RECOVERYIMAGE_PARTITION_SIZE := 23068672 #640M
 BOARD_SYSTEMIMAGE_PARTITION_SIZE := 671088640 #640M
 BOARD_USERDATAIMAGE_PARTITION_SIZE := 4294967296 #4g
 BOARD_CACHEIMAGE_PARTITION_SIZE := 671088640 # 640M

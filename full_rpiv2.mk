@@ -1,5 +1,5 @@
 #
-# Copyright 2013 The Android Open-Source Project
+# Copyright 2013 The Android Open Source Project
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,32 +13,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-$(call inherit-product, device/raspberryPi/rpiv2/full_rpiv2.mk)
 
-PRODUCT_NAME := aosp_rpiv2
+# Sample: This is where we'd set a backup provider if we had one
+# $(call inherit-product, device/sample/products/backup_overlay.mk)
 
-PRODUCT_PACKAGES += \
-    Launcher3
-
-
-$(call inherit-product, $(SRC_TARGET_DIR)/product/languages_full.mk)
 
 # Inherit from the common Open Source product configuration
 $(call inherit-product, $(SRC_TARGET_DIR)/product/aosp_base_telephony.mk)
+$(call inherit-product, $(SRC_TARGET_DIR)/product/languages_full.mk)
+$(call inherit-product, build/target/product/full.mk)
 
-
-LOCAL_PATH := device/raspberryPi/rpiv2
-
-
-
-# Overrides
-PRODUCT_NAME := aosp_rpiv2
+PRODUCT_NAME := full_rpiv2
 PRODUCT_DEVICE := rpiv2
 PRODUCT_BRAND := Android
-PRODUCT_MODEL := Full AOSP on Raspberry Pi 2
-
-PRODUCT_PACKAGES += \
-    Launcher3
-
+PRODUCT_MODEL := AOSP on Raspberry Pi 2
+PRODUCT_MANUFACTURER := RPI
+PRODUCT_RESTRICT_VENDOR_FILES := false
 
 $(call inherit-product, device/raspberryPi/rpiv2/device.mk)
+$(call inherit-product-if-exists, vendor/raspberryPi/rpiv2/rpiv2-vendor.mk)

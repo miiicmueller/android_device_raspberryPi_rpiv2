@@ -15,4 +15,5 @@
 #
 
 PRODUCT_MAKEFILES := \
-    $(LOCAL_DIR)/device_rpiv2.mk
+    $(LOCAL_DIR)/aosp_rpiv2.mk
+    $(LOCAL_DIR)/full_rpiv2.mk \

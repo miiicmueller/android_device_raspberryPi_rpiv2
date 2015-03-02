@@ -1,3 +1,6 @@
+# Release name
+PRODUCT_RELEASE_NAME := cm_rpiv2
+
 # Boot animation
 TARGET_SCREEN_HEIGHT := 1920
 TARGET_SCREEN_WIDTH := 1080
@@ -7,10 +10,10 @@ TARGET_BOOTANIMATION_HALF_RES := true
 $(call inherit-product, vendor/cm/config/common_full_phone.mk)
 
 # Inherit device configuration for p500.
-$(call inherit-product, device/raspberryPi/rpiv2/aosp_rpiv2.mk)
+$(call inherit-product, device/raspberryPi/rpiv2/full_rpiv2.mk)
 
 PRODUCT_NAME := cm_rpiv2
-PRODUCT_BRAND := raspi2
+PRODUCT_BRAND := google
 PRODUCT_DEVICE := rpiv2
 PRODUCT_MODEL := Raspberry Pi 2
 PRODUCT_MANUFACTURER := Raspberry Pi
