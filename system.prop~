@@ -1,0 +1,15 @@
+#
+# system.prop for rpiv2
+#
+
+ro.sf.lcd_density=240
+
+# Default network type.
+# 0 => WCDMA preferred.
+ro.telephony.default_network=0
+wifi.interface=eth0
+wifi.supplicant_scan_interval=15
+
+
+dalvik.vm.heapsize=32m
+

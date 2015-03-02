@@ -1,0 +1,7 @@
+#
+# system.prop for rpiv2
+#
+
+
+dalvik.vm.heapsize=32m
+

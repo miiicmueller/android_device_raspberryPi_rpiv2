@@ -84,7 +84,7 @@ PRODUCT_PROPERTY_OVERRIDES += \
 PRODUCT_CHARACTERISTICS := nosdcard
 
 DEVICE_PACKAGE_OVERLAYS := \
-    device/raspberryPi/rpiv2/overlay
+    device/lge/hammerhead/overlay
 
 
 # setup dalvik vm configs.
