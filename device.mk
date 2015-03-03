@@ -4,11 +4,16 @@ else
 	LOCAL_KERNEL := $(TARGET_PREBUILT_KERNEL)
 endif
 
+
 PRODUCT_COPY_FILES += \
     $(LOCAL_KERNEL):kernel
 
+
 PRODUCT_COPY_FILES += \
+    device/raspberryPi/rpiv2/init.recovery.bcm2709.rc:root/init.recovery.bcm2709.rc \
+    device/raspberryPi/rpiv2/fstab.bcm2709:root/fstab.bcm2709 \
     device/raspberryPi/rpiv2/recovery.fstab:root/recovery.fstab
+
 
 PRODUCT_PROPERTY_OVERRIDES := \
     ro.ril.hsxpa=1 \

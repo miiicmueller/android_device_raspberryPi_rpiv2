@@ -4,4 +4,4 @@
 
 
 dalvik.vm.heapsize=32m
-
+ro.serialno = 00000001

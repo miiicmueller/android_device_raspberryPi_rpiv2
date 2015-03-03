@@ -1,0 +1,13 @@
+## Daemon processes to be run by init.
+##
+
+service console /system/bin/sh
+    class core
+    console
+    disabled
+    user shell
+    group shell log
+    seclabel u:r:shell:s0
+
+on property:ro.debuggable=1
+    start console
