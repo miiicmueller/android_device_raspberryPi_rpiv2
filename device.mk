@@ -10,6 +10,18 @@ PRODUCT_COPY_FILES += \
 PRODUCT_COPY_FILES += \
     device/raspberryPi/rpiv2/recovery.fstab:root/recovery.fstab
 
+PRODUCT_PROPERTY_OVERRIDES := \
+    ro.ril.hsxpa=1 \
+    ro.ril.gprsclass=10
+
+PRODUCT_COPY_FILES := \
+	device/raspberryPi/rpiv2/egl.cfg:system/lib/egl/egl.cfg \
+
+PRODUCT_PACKAGES := \
+    audio.primary.goldfish 
+	#libGLES_hgl
+
+
 PRODUCT_PACKAGES := \
     libwpa_client \
     hostapd \
