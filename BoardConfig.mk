@@ -27,6 +27,7 @@ ARCH_ARM_HAVE_TLS_REGISTER := true
 TARGET_CPU_VARIANT := cortex-a7
 
 BRCM_V3D_OPT := true
+DEBUG_V3D := true
 TARGET_NO_HW_VSYNC := true
 
 # Davik variables
@@ -52,9 +53,20 @@ TARGET_KERNEL_SOURCE := kernel/raspberryPi/rpiv2
 TARGET_KERNEL_CONFIG := cyanogenmod_rpiv2_defconfig
 BOARD_KERNEL_IMAGE_NAME := zImage
 BOARD_MKBOOTIMG_ARGS := --ramdisk_offset 0x02900000 --tags_offset 0x02700000
-#BOARD_KERNEL_CMDLINE := console=ttyAMA0,115200 kgdboc=ttyAMA0,115200 root=/dev/mmcblk0p2 rootfstype=ext4 rootwait
-#BOARD_KERNEL_BASE := 0x00000000
+BOARD_KERNEL_CMDLINE := console=ttyAMA0,115200 kgdboc=ttyAMA0,115200 root=/dev/mmcblk0p2 rootfstype=ext4 rootwait
 BOARD_KERNEL_PAGESIZE := 2048
+
+V3D_MODULES:
+	make -C device/raspberryPi/rpiv2/hardware/modules/v3d/ KERNEL_DIR=$(KERNEL_OUT) ARCH="arm" CROSS_COMPILE=$(KERNEL_TOOLCHAIN_PREFIX)
+	mv device/raspberryPi/rpiv2/hardware/modules/v3d/v3d_opt.ko $(KERNEL_MODULES_OUT)
+
+GMEM_MODULES:
+	make -C device/raspberryPi/rpiv2/hardware/modules/gmemalloc/ KERNEL_DIR=$(KERNEL_OUT) ARCH="arm" CROSS_COMPILE=$(KERNEL_TOOLCHAIN_PREFIX)
+	mv device/raspberryPi/rpiv2/hardware/modules/gmemalloc/bmem/bmem.ko $(KERNEL_MODULES_OUT)
+	mv device/raspberryPi/rpiv2/hardware/modules/gmemalloc/bmem_wrapper/bmem_wrap.ko $(KERNEL_MODULES_OUT)
+    
+TARGET_KERNEL_MODULES := V3D_MODULES
+TARGET_KERNEL_MODULES += GMEM_MODULES
 
 # EGL
 BOARD_EGL_CFG := device/raspberryPi/rpiv2/egl.cfg
@@ -90,7 +102,7 @@ BOARD_HAS_NO_SELECT_BUTTON := true
 
 
 # Enable Minikin text layout engine (will be the default soon)
-USE_MINIKIN := true
+#USE_MINIKIN := true
 
 # Include an expanded selection of fonts
 EXTENDED_FONT_FOOTPRINT := true

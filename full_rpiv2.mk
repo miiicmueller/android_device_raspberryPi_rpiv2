@@ -21,7 +21,7 @@
 # Inherit from the common Open Source product configuration
 $(call inherit-product, $(SRC_TARGET_DIR)/product/aosp_base_telephony.mk)
 $(call inherit-product, $(SRC_TARGET_DIR)/product/languages_full.mk)
-$(call inherit-product, build/target/product/full.mk)
+#$(call inherit-product, build/target/product/full.mk)
 
 PRODUCT_NAME := full_rpiv2
 PRODUCT_DEVICE := rpiv2

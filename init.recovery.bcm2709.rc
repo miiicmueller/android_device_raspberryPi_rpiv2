@@ -1,13 +1,25 @@
+on fs
+    mount ext4 /dev/block/mmcblk0p6 /data wait noatime nosuid nodev
+    mount ext4 /dev/block/mmcblk0p7 /cache wait noatime nosuid nodev
+
 ## Daemon processes to be run by init.
 ##
 
-service console /system/bin/sh
+service logd /system/bin/logd
+    class core
+    socket logd stream 0666 logd logd
+    socket logdr seqpacket 0666 logd logd
+    socket logdw dgram 0222 logd logd
+    seclabel u:r:logd:s0
+
+
+service console /sbin/sh
     class core
     console
     disabled
-    user shell
-    group shell log
-    seclabel u:r:shell:s0
+    user root
+    group root log
+    seclabel u:r:root:s0
 
 on property:ro.debuggable=1
     start console

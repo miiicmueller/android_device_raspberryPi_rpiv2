@@ -19,3 +19,4 @@ PRODUCT_NAME := aosp_rpiv2
 
 PRODUCT_PACKAGES += \
     Launcher3
+
