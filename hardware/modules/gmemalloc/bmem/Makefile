@@ -11,4 +11,14 @@
 # the GPL, without Broadcom's express prior written consent.
 #*******************************************************************************
 
-obj-m := bmem.o 
+obj-m += bmem.o
+
+GBMEM_SRC := $(shell pwd)
+
+LOCAL_PATH:= $(call my-dir)
+
+all:
+	make -C $(KERNEL_DIR) M=$(GBMEM_SRC) modules
+
+modules_install:
+	make -C $(KERNEL_DIR) M=$(GBMEM_SRC) modules_install

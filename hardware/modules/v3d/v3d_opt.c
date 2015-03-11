@@ -44,9 +44,9 @@
 //#define DEBUG_DUMP_CL
 //#endif
 
-//#ifndef DEBUG_V3D_ISR
-//#define DEBUG_V3D_ISR
-//#endif
+#ifndef DEBUG_V3D_ISR
+#define DEBUG_V3D_ISR
+#endif
 
 //#define CONFIG_BCM21553_V3D_SYNC_ENABLE
 
@@ -177,13 +177,13 @@ static struct semaphore v3d_status_sem;
 static void v3d_stat_start_point(void);
 static void v3d_stat_end_point(void);
 #define V3D_PROC_PRINT_D(str, val) \
-	if (v3d_proc_print_info(str, val, 0, 0, &curr, &len, count)) goto err;
+	if (v3d_proc_print_info(str, val, 0, 0, &curr, &len, 500)) goto err;
 #define V3D_PROC_PRINT_X(str, val) \
-	if (v3d_proc_print_info(str, val, 0, 1, &curr, &len, count)) goto err;
+	if (v3d_proc_print_info(str, val, 0, 1, &curr, &len, 500)) goto err;
 #define V3D_PROC_PRINT_F(str, val, fract) \
-		if (v3d_proc_print_info(str, val, fract, 2, &curr, &len, count)) goto err;
+		if (v3d_proc_print_info(str, val, fract, 2, &curr, &len, 500)) goto err;
 #define V3D_PROC_PRINT_HDR(str) \
-	if (v3d_proc_print_info(str, 0, 0, 3, &curr, &len, count)) goto err;
+	if (v3d_proc_print_info(str, 0, 0, 3, &curr, &len, 500)) goto err;
 #ifndef MIN
 #define MIN(A,B)      ((A) > (B) ? (B) : (A))
 #endif
@@ -1050,15 +1050,13 @@ static int v3d_proc_print_info(char *str, int value, int fract, int print_type,
  * v3d_proc_get_status()
  * Description : proc read callback to print the v3d status
  */
-static int v3d_proc_get_status(char *page, char **start, off_t off, int count,
-		int *eof, void *data) {
-	char *curr = page;
+static int v3d_proc_get_status(struct file *file, char __user *buf, size_t size, loff_t *offset) {
+	// Buffer to send to userspace
+	char curr[500];
 	int len = 0;
 	int i, idx, avg;
 
-	KLOG_V("proc read has come: page[%p], off[%d], count[%d], data[%p] \n",
-			page, (int)off, count, data);
-	if (off != 0) {
+	if (*offset != 0) {
 		goto err;
 	}
 
@@ -1087,13 +1085,10 @@ static int v3d_proc_get_status(char *page, char **start, off_t off, int count,
 	}
 	up(&v3d_status_sem);
 
-	err: if (start) {
-		*start = page;
-	}
-	if (eof) {
-		*eof = 1;
-	}
-	return (len < count) ? len : count;
+
+	err: copy_to_user(buf,curr,len);
+	*offset = len;
+	return len;
 }
 
 static int v3d_parse_string(const char *inputStr, u32 *opCode, u32 *arg) {
@@ -2394,12 +2389,13 @@ int __init v3d_opt_init(void) {
 #ifdef ENABLE_PROCFS
 
 	KLOG_D("Create procfs");
-	v3d_proc_file = create_proc_entry(V3D_DEV_NAME, 0644, NULL);
+	
+	v3d_proc_fops.read = v3d_proc_get_status;
+	v3d_proc_fops.write = v3d_proc_set_status;
+	v3d_proc_file = proc_create(V3D_DEV_NAME, 0644, NULL, &v3d_proc_fops );
 
 	if (v3d_proc_file) {
-		v3d_proc_file->data = NULL;
-		v3d_proc_file->read_proc = v3d_proc_get_status;
-		v3d_proc_file->write_proc = v3d_proc_set_status;
+		KLOG_D("Create procfs success ! ");
 		// v3d_proc_file->owner = THIS_MODULE;
 	} else {
 		KLOG_E("Failed creating proc entry");

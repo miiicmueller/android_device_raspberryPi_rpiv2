@@ -249,9 +249,10 @@ static int bmem_pmem_connect(unsigned long master_fd, struct file *file) {
 	int ret = 0, put_needed;
 
 	/* retrieve the src file and check it is a pmem file with an alloc */
-	master_file = fget_light(master_fd, &put_needed);
-	KLOG_D("master_fd[%d] master_file[%p] subfile[%p], put_needed[%d]\n",
-			(int)master_fd, master_file, file, put_needed);
+
+	//master_file = fget_light(master_fd, &put_needed);
+	master_file = __fdget(master_fd);
+	KLOG_D("master_fd[%d] master_file[%p] subfile[%p], put_needed[%d]\n", (int)master_fd, master_file, file, put_needed);
 	if (!master_file) {
 		p_data->bmem_pmem_data.connected = -1;
 		KLOG_E("pmem_connect: master file not found!\n");
@@ -273,7 +274,7 @@ static int bmem_pmem_connect(unsigned long master_fd, struct file *file) {
 	p_data->bmem_pmem_data.allocated = p_master_data->bmem_pmem_data.allocated;
 	p_data->bmem_pmem_data.connected = 1;
 
-	err_bad_file: fput_light(master_file, put_needed);
+	err_bad_file: fput_light(master_file, (unsigned long)master_file);
 	err_no_file: return ret;
 }
 
@@ -502,15 +503,12 @@ static int bmem_proc_print_info(char *str, int value, int print_type,
  * bmem_proc_get_status()
  * Description : proc read callback to print the bmem heap status
  */
-static int bmem_proc_get_status(char *page, char **start, off_t off, int count,
-		int *eof, void *data) {
-	char *curr = page;
+static int bmem_proc_get_status(struct file *file, char __user *buf, size_t size, loff_t *offset) {
+	char curr[500];
 	int len = 0;
 	int result;
 
-	KLOG_D("proc read has come: page[%p], off[%d], count[%d], data[%p] \n",
-			page, (int)off, count, data);
-	if (off != 0) {
+	if (*offset != 0) {
 		goto err;
 	}
 
@@ -556,13 +554,9 @@ static int bmem_proc_get_status(char *page, char **start, off_t off, int count,
 	BMEM_PROC_PRINT_D("Mem Free Failures", bmem_status.free_fail_cnt);
 	up(&bmem_status_sem);
 
-	err: if (start) {
-		*start = page;
-	}
-	if (eof) {
-		*eof = 1;
-	}
-	return (len < count) ? len : count;
+	err:copy_to_user(buf,curr,len);
+	*offset = len;
+	return len ;
 }
 
 static int bmem_parse_string(const char *inputStr, u32 *opCode, u32 *arg) {
@@ -681,10 +675,8 @@ static int bmem_proc_set_status(struct file *file, const char *buffer,
 		break;
 
 	default:
-		KLOG_D(
-				"1 or reset_statistics   - clear the min/max values to start statistics fresh");
-		KLOG_D(
-				"2 or reset_bmem         - reset the debug, stat levels and threshold");
+		KLOG_D("1 or reset_statistics   - clear the min/max values to start statistics fresh");
+		KLOG_D("2 or reset_bmem         - reset the debug, stat levels and threshold");
 		KLOG_D("threshold n             - set the threshold level");
 		KLOG_D("debug n                 - set the debug level");
 		KLOG_D("   1 - Print on all alloc and free");
@@ -754,16 +746,13 @@ static int bmem_wrapper_ioctl(struct file *filp, unsigned int cmd,
 
 		ret = copy_from_user(&memparams, (const void *) arg, sizeof(memparams));
 		if (ret != 0) {
-			KLOG_E(
-					"Error in copying user arguments in GEMEMALLOC_WRAP_ACQUIRE_BUFFER");
+			KLOG_E("Error in copying user arguments in GEMEMALLOC_WRAP_ACQUIRE_BUFFER");
 			return ret;
 		}
 		page_aligned_size = (((memparams.size + (PAGE_SIZE - 1)) >> PAGE_SHIFT)
 				<< PAGE_SHIFT);
 		if (memparams.size != page_aligned_size) {
-			KLOG_D(
-					"GEMEMALLOC_WRAP_ACQUIRE_BUFFER: size[0x%08x] made multiple of page size",
-					memparams.size);
+			KLOG_D( "GEMEMALLOC_WRAP_ACQUIRE_BUFFER: size[0x%08x] made multiple of page size",memparams.size);
 			memparams.size = page_aligned_size;
 		}
 		if (page_aligned_size == 0) {
@@ -910,11 +899,11 @@ static int bmem_wrapper_ioctl(struct file *filp, unsigned int cmd,
 	case PMEM_GET_SIZE:
 	case PMEM_GET_TOTAL_SIZE:
 	case PMEM_ALLOCATE:
-	case PMEM_CACHE_FLUSH: {
+	/*case PMEM_CACHE_FLUSH: {
 		KLOG_E("pmem ioctl [0x%08x] currently not supported by this driver. \n",
 				cmd);
 		result = -1;
-	}
+	}*/
 		break;
 	default: {
 		KLOG_D("Invalid ioctl command : file[%p] cmd[0x%08x]", filp, cmd);
@@ -1213,13 +1202,12 @@ int __init bmem_wrapper_init(void) {
 	sema_init(&bmem_virt_list_sem, 1);
 
 // Proc sysfs creation
-	bmem_proc_file = create_proc_entry(DEV_NAME, 0644, NULL);
+	bmem_proc_fops.read = bmem_proc_get_status;
+	bmem_proc_fops.write = bmem_proc_set_status;
+	bmem_proc_file = proc_create(DEV_NAME, 0644, NULL, &bmem_proc_fops);
 
 	if (bmem_proc_file) {
-		bmem_proc_file->data = NULL;
-		bmem_proc_file->read_proc = bmem_proc_get_status;
-		bmem_proc_file->write_proc = bmem_proc_set_status;
-		// bmem_proc_file->owner = THIS_MODULE;
+		KLOG_D("Proc file creation success !");
 	} else {
 		KLOG_E("Failed creating proc entry");
 	}

@@ -61,7 +61,8 @@ V3D_MODULES:
 	mv device/raspberryPi/rpiv2/hardware/modules/v3d/v3d_opt.ko $(KERNEL_MODULES_OUT)
 
 GMEM_MODULES:
-	make -C device/raspberryPi/rpiv2/hardware/modules/gmemalloc/ KERNEL_DIR=$(KERNEL_OUT) ARCH="arm" CROSS_COMPILE=$(KERNEL_TOOLCHAIN_PREFIX)
+	make -C device/raspberryPi/rpiv2/hardware/modules/gmemalloc/bmem KERNEL_DIR=$(KERNEL_OUT) ARCH="arm" CROSS_COMPILE=$(KERNEL_TOOLCHAIN_PREFIX)
+	make -C device/raspberryPi/rpiv2/hardware/modules/gmemalloc/bmem_wrapper KERNEL_DIR=$(KERNEL_OUT) ARCH="arm" CROSS_COMPILE=$(KERNEL_TOOLCHAIN_PREFIX)
 	mv device/raspberryPi/rpiv2/hardware/modules/gmemalloc/bmem/bmem.ko $(KERNEL_MODULES_OUT)
 	mv device/raspberryPi/rpiv2/hardware/modules/gmemalloc/bmem_wrapper/bmem_wrap.ko $(KERNEL_MODULES_OUT)
     

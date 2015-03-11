@@ -1,2 +1,12 @@
 # Ignore save
 *~
+
+#ingore builded objects
+*.o
+*.cmd
+*.mod.c
+
+
+*.tmp_versions
+*.symvers
+*.order
